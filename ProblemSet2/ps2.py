@@ -247,7 +247,7 @@ class StandardRobot(Robot):
         self.room.cleanTileAtPosition(self.new_position)
 
 # Uncomment this line to see your implementation of StandardRobot in action!
-##testRobotMovement(StandardRobot, RectangularRoom)
+## testRobotMovement(StandardRobot, RectangularRoom)
 
 
 # === Problem 3
@@ -272,17 +272,18 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     trials = []
     for trialnum in range(num_trials):
         room = RectangularRoom(width, height)
-        robot = robot_type(room, speed)
+        robots = [robot_type(room, speed) for i in range(num_robots)]
         tiles = room.getNumTiles()
         times = 0
-        while(room.getNumCleanedTiles()/tiles < min_coverage):
-            robot.updatePositionAndClean()
+        while(room.getNumCleanedTiles()/float(tiles) < min_coverage):
+            for robot in robots:
+                robot.updatePositionAndClean()
             times += 1
         trials.append(times)
-    return sum(trials)/len(trials)
+    return sum(trials)/float(len(trials))
 
 # Uncomment this line to see how much your simulation takes on average
-##print  runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot)
+## print  runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot)
 
 
 # === Problem 4
@@ -298,8 +299,17 @@ class RandomWalkRobot(Robot):
         Move the robot to a new position and mark the tile it is on as having
         been cleaned.
         """
-        raise NotImplementedError
+        self.setRobotDirection(random.random()*360)
+        self.new_position = self.position.getNewPosition(self.direction, self.speed)
+        
+        while(self.room.isPositionInRoom(self.new_position)==False):
+            self.setRobotDirection(random.random()*360)
+            self.new_position = self.position.getNewPosition(self.direction, self.speed)
+            
+        self.setRobotPosition(self.new_position)
+        self.room.cleanTileAtPosition(self.new_position)
 
+##testRobotMovement(RandomWalkRobot, RectangularRoom)
 
 def showPlot1(title, x_label, y_label):
     """
